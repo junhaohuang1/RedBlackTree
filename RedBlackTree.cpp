@@ -218,6 +218,7 @@ void RedBlackTree<T>::doRotation(Node * point)
 		Node* grandparent = point->parent->parent;
 		if (!(*point->parent).isBlack) {
 			Node* uncle = (grandparent->left == point->parent) ? grandparent->right : grandparent->left;
+			Node* parent = point->parent;
 			//if uncle is black
 			if (uncle == nullptr || (*uncle).isBlack) {
 				//if the node is outside, single rotate grandparent
