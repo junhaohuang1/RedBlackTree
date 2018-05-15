@@ -2,12 +2,11 @@
 
 template<typename T>
 
-class RedBlackTree{
+class RedBlackTree {
 
 private:
 	struct Node {
 		T data;
-		int height;
 		bool isBlack;
 		Node* parent, *left, *right;
 		Node();
@@ -22,9 +21,12 @@ private:
 	void doubleCR(Node*& point);
 	void singleCR(Node*& point);
 	void doubleCCR(Node*& point);
-	void doRotation(Node* point);
+	//fix violations after insertions
+	void fixRedParentBlackUncleViolation(Node* point);
+	//fix violations as looking for point of insertion
+	void fixBlackParentTwoRedChildrenViolation(Node* point);
 	void recolor(Node*& node);
-	void print(Node*& root);
+	void print(Node* root) const;
 	Node*& find(const T& toFind, Node* root) const;
 	void insert(const T& item, Node* root, Node* parent);
 	void clear(Node* root);
@@ -35,7 +37,7 @@ public:
 	RedBlackTree& operator=(const RedBlackTree<T> rhs);
 	virtual ~RedBlackTree();
 	RedBlackTree<T>(const RedBlackTree<T>& rhs);
-	
+
 	bool isInTree(const T& toFind) const;
 	bool isEmpty() const;
 	int size()const;

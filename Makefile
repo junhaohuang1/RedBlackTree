@@ -15,4 +15,4 @@ RedBlackTree.o:RedBlackTree.cpp
 	$(CC) $(CFLAGS) RedBlackTree.cpp
 	
 clean:
-	rm *.o jhh492_hw17_q1
+	rm *.o jhh492_hw17_q1.exe
