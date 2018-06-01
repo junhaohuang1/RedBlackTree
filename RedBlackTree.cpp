@@ -103,8 +103,7 @@ inline void RedBlackTree<T>::singleCCR(Node*& point)
 		parent->parent->right = parent;
 	else
 		parent->parent->left = parent;
-	recolor(grandparent);
-	recolor(parent);
+
 }
 
 template<typename T>
@@ -131,8 +130,7 @@ inline void RedBlackTree<T>::singleCR(Node*& point)
 		parent->parent->left = parent;
 	else
 		parent->parent->right = parent;
-	recolor(grandparent);
-	recolor(parent);
+
 }
 
 template<typename T>
@@ -158,7 +156,7 @@ void RedBlackTree<T>::print(Node* root) const
 {
 	if (root->left != nullptr)
 		print(root->left);
-	std::cout << root->data;
+	std::cout << root->data << " ";
 	if (root->right != nullptr)
 		print(root->right);
 }
@@ -191,65 +189,81 @@ RedBlackTree<T>::Node::Node(const T & data, Node * parent, Node * left, Node * r
 
 template<typename T>
 void RedBlackTree<T>::insert(const T & item, Node * root, Node* parent)
-{
-	if (isEmpty()) {
-		this->root = new Node(item);
-		(*this->root).isBlack = true;
+{	
+	if (root == nullptr) {
 		this->nodeCount++;
-	}else if (root != nullptr) {
+		if (root == this->root) {
+			this->root = new Node(item);
+		}
+		else {
+			if (parent->data < item) {
+				parent->right = new Node(item, parent, nullptr, nullptr);
+				root = parent->right;
+			}
+			else if (parent->data > item) {
+				parent->left = new Node(item, parent, nullptr, nullptr);
+				root = parent->left;
+			}
+		}
+		fixRedParentBlackUncleViolation(root);
+	}
+	else if (root != nullptr) {
 		fixBlackParentTwoRedChildrenViolation(root);
 		if (root->data < item)
 			insert(item, root->right, root);
 		else if (root->data > item)
 			insert(item, root->left, root);
 	}
-	else {
-		this->nodeCount++;
-		if (parent->data < item) {
-			parent->right = new Node(item, parent, nullptr, nullptr);
-			root = parent->right;
-		}
-		else if (parent->data > item) {
-			parent->left = new Node(item, parent, nullptr, nullptr);
-			root = parent->left;
-		}
-		fixRedParentBlackUncleViolation(root);
-	}
+	else
+		;
+
 }
 
 template<typename T>
-void RedBlackTree<T>::fixRedParentBlackUncleViolation(Node * point)
+void RedBlackTree<T>::fixRedParentBlackUncleViolation(Node *& point)
 {
-	if (point != nullptr) {
-		//check for when parent is red and uncle is black after inserting
-		if (point->parent != nullptr) {
-			Node* parent = point->parent;
-			if (parent->parent != nullptr) {
-				Node* grandparent = parent->parent;
-				if (!(*parent).isBlack) {
-					Node* uncle = (grandparent->left == point->parent) ? grandparent->right : grandparent->left;
-					//if uncle is black
-					if (uncle == nullptr || (*uncle).isBlack) {
-						//if the node is outside, single rotate grandparent
-						if (point == parent->left && parent == grandparent->left)
-							singleCR(grandparent);
-						else if (point == parent->right && parent == grandparent->right)
-							singleCCR(grandparent);
-						//if node is inside, double rotate grandparent
-						else if (point == parent->left && parent == grandparent->right)
-							doubleCCR(grandparent);
-						else if (point == parent->right && parent == grandparent->left)
-							doubleCR(grandparent);
-					}
-				}
-			}
+	Node* parent, *grandparent, *uncle;
+	if (point == nullptr)
+		return;
+	else {
+		if (!(*point).isBlack) {
+			//check for when parent is red and uncle is black after inserting
+			if (point->parent != nullptr) {
+				parent = point->parent;
+				if (parent->parent != nullptr) {
+					grandparent = parent->parent;
+					if (!(*parent).isBlack) {
+						Node* uncle = (grandparent->left == point->parent) ? grandparent->right : grandparent->left;
+						//if uncle is black
+						if (uncle == nullptr || (*uncle).isBlack) {
+							if (point == parent->left && parent == grandparent->left) {
+								singleCR(grandparent);
+								recolor(parent);
+								recolor(grandparent);
+							}
+							else if (point == parent->right && parent == grandparent->right) {
+								singleCCR(grandparent);
+								recolor(parent);
+								recolor(grandparent);
 
+							}
+							else if (point == parent->left && parent == grandparent->right)
+								singleCR(parent);
+							else if (point == parent->right && parent == grandparent->left)
+								singleCCR(parent);
+						}
+					}
+				
+				}
+
+			}
 		}
-	}
+		fixRedParentBlackUncleViolation(point->parent);
+	}	
 }
 
 template<typename T>
-void RedBlackTree<T>::fixBlackParentTwoRedChildrenViolation(Node* point) {
+void RedBlackTree<T>::fixBlackParentTwoRedChildrenViolation(Node*& point) {
 	//check for black parent with two red children as inserting
 	if (point != nullptr) {
 		if (point->left != nullptr && point->right != nullptr) {
@@ -259,10 +273,7 @@ void RedBlackTree<T>::fixBlackParentTwoRedChildrenViolation(Node* point) {
 				recolor(point->right);
 				if (point->parent != nullptr) {
 					if (!(*point->parent).isBlack) {
-						if (point == point->parent->left)
-							singleCR(point->parent->parent);
-						else if (point == point->parent->right)
-							singleCCR(point->parent->parent);
+						fixRedParentBlackUncleViolation(point->parent);
 					}
 				}
 			}

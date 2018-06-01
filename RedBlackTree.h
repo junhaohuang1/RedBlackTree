@@ -22,9 +22,9 @@ private:
 	void singleCR(Node*& point);
 	void doubleCCR(Node*& point);
 	//fix violations after insertions
-	void fixRedParentBlackUncleViolation(Node* point);
+	void fixRedParentBlackUncleViolation(Node*& point);
 	//fix violations as looking for point of insertion
-	void fixBlackParentTwoRedChildrenViolation(Node* point);
+	void fixBlackParentTwoRedChildrenViolation(Node*& point);
 	void recolor(Node*& node);
 	void print(Node* root) const;
 	Node*& find(const T& toFind, Node* root) const;
